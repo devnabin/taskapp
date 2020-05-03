@@ -1,0 +1,18 @@
+{
+  "name": "taskapp",
+  "version": "1.0.0",
+  "description": "1. Download and install Mango database zip file from this link\r [Here -->  Mongo](https://www.mongodb.com/download-center/community)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  },
+  "dependencies": {
+    "mongodb": "^3.5.6"
+  }
+}
