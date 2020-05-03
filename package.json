@@ -4,7 +4,7 @@
   "description": "1. Download and install Mango database zip file from this link\r [Here -->  Mongo](https://www.mongodb.com/download-center/community)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/app.js"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +13,8 @@
     "nodemon": "^2.0.3"
   },
   "dependencies": {
-    "mongodb": "^3.5.6"
+    "mongodb": "^3.5.6",
+    "mongoose": "^5.9.11",
+    "validator": "^13.0.0"
   }
 }
