@@ -1,79 +1,148 @@
-const mongoose = require('mongoose')
-const validator = require('validator')
+const express = require("express");
+require("./db/mongo");
+const usermodel = require("./db/user");
+const taskmodel = require("./db/task");
 
-//connection to our database 
-// mongodb://localhost:27017/mysite  here mongodb://url / database 
-//here mysite is database
-mongoose.connect('mongodb://localhost:27017/mysite' , {
-    useNewUrlParser:true,
-    useUnifiedTopology: true
+const app = express();
+const Port = process.env.PORT || 3000;
+//to parse post json
+app.use(express.json());
+
+app.get("/user", async (req, res) => {
+  try {
+    const user = await usermodel.find({})
+    res.send(user);
+
+  } catch (error) {
+    res.status(500).send();
+  }
+});
+
+app.get("/user/:id", async (req, res) => {
+  const _id = req.params.id;
+try {
+  const user = await usermodel.findById(_id)
+  if (!user) return res.status(500).send();
+  res.send(user)
+} catch (error) {
+  res.status(500).send();
+}
+});
+
+
+//task
+app.get("/task",async (req, res) => {
+  try {
+ const task = await  taskmodel.find({})
+ res.send(task);
+    
+  } catch (error) {
+    res.status(500).send();
+    
+  }
+});
+
+app.get("/task/:id",async (req, res) => {
+  try {
+  const _id = req.params.id;
+  const task = await taskmodel.findById(_id)
+  if (!task) return res.status(404).send();
+  res.send(task)
+
+  } catch (error) {
+    res.status(404).send();
+  }
+});
+
+
+//Post
+app.post("/user", async ({ body }, res) => {
+  try {
+  const adduser =await new usermodel(body);
+  await adduser.save()
+  res.send(adduser)
+  } catch (error) {
+    res.status(400).send(error)
+  }
+});
+
+app.post("/task", async ({ body }, res) => {
+  try {
+  const mytask =await new taskmodel(body);
+  await mytask.save()
+  res.status(300).send(mytask)
+  } catch (error) {
+    res.status(400).send(error)
+  }
+});
+
+
+//patch update 
+app.patch("/user/:id" , async(req, res)=>{
+  const updates = Object.keys(req.body)
+  const allowUpdate = ['name' , 'email' , 'password']
+  const isAllUpdate = updates.every((upvalue)=> allowUpdate.includes(upvalue));
+  console.log(isAllUpdate)
+  if(!isAllUpdate){
+    return res.status(404).send({error:'Invalid updates'})    
+  }
+  try {
+    console.log(req.params.id)
+    console.log(req.body)
+
+ const user = await usermodel.findByIdAndUpdate(req.params.id , req.body , {new: true , runValidators: true});
+ //new means new update with another copy in const user and run validator means run that validator agian when update
+ if(!user) return res.status(401).send()    
+ res.status(201).send(user)    
+  } catch (error) {
+ res.status(401).send(error)    
+    
+  }
 })
 
 
-//model for user
-const model = mongoose.model('user',{
-    name:{
-        type:String,
-        required: true,
-    },
-    address:{
-     type : String,
-     validate(value){
-         if(value<=0){
-             throw new Error('You must provide the valid age')
-         }
-     }
-    },
-    email :{
-        type : String,
-        lowercase : true,
-        trim : true , 
-        required : true,
-        validate(value){
-            if(!validator.isEmail(value)
-            ){
-                throw new Error('Email is invalid or not available')
-            }
-        }
-    },
-    password :{
-        type : String , 
-        required : true,
-        trim: true,
-        minlength: 6, 
-        validate(value){
-            if(value.includes("password")){
-                throw new Error('password contain that word password')
-            }
-        }
-
-    }
-})
-const taskmodel = mongoose.model('task' , {
-    description :{
-        type : String , 
-        trim : true ,
-        required : true ,
-    },
-    completed :{
-        type : Boolean ,
-        default : false,
-    }
+app.patch('/task/:id' , async (req, res)=>{
+  const updates  = Object.keys(req.body)
+  const Proname = ['completed' , 'description']
+  const isValue = updates.every((update)=> Proname.includes(update))
+  if(!isValue){
+    return res.status(401).send({error : 'Invalid request'})    
+  }
+  try {
+    const task = await taskmodel.findByIdAndUpdate(req.params.id , req.body , { new : true , runValidators: true})
+    if(!task)  return res.status(401).send()    
+   res.status(200).send(task)
+  } catch (error) {
+ res.status(401).send(error)    
+  } 
 })
 
 
-//For user
-/* const person1 = new model({
-    name:'Nabin Bhandari', 
-  email : 'nabincoc@asdf.com', 
-  password : 'na13'
+
+//Delete
+app.delete('/user/:id' , async (req,res)=>{
+  try {
+    const user = await usermodel.findByIdAndDelete(req.params.id)
+    if(!user) return res.status(404).send() 
+
+    res.status(200).send(user)
+
+  } catch (error) {
+    res.status(500).send() 
+  }
 })
-person1.save().then(res=> console.log('File save' , res)).catch(error => console.log('error' , error)) 
-*/
+
+app.delete('/task/:id' , async (req,res)=>{
+  try {
+    const task = await taskmodel.findByIdAndDelete(req.params.id)
+    if(!task) return res.status(404).send() 
+    res.status(200).send(task)
+
+  } catch (error) {
+    res.status(500).send() 
+  }
+})
 
 
-//For task
-const  persontask = new taskmodel({
-    description : 'Open book      '
-})
-persontask.save().then(res => console.log('Files saved successfully' , res)).catch(error => console.log('something error' , error))
+
+app.listen(Port, () => console.log("app is listern on port " + Port));
