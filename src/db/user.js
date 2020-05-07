@@ -1,7 +1,12 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
+const bcrypt = require('bcrypt')
 //model for user
-const usermodel = mongoose.model('user',{
+//Here user is the Collection
+
+
+  
+  const userSchema = new mongoose.Schema({
     name:{
         type:String,
         required: true,
@@ -39,6 +44,18 @@ const usermodel = mongoose.model('user',{
 
     }
 })
+
+
+//pre
+userSchema.pre('save' ,async function(next){
+    const user = this
+    if(user.isModified('password')){
+        user.password = await bcrypt.hash(this.password , 8)
+
+    }
+    next()
+})
+const usermodel = mongoose.model('user', userSchema)
 
 
 

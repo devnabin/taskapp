@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 //connection to our database 
 // mongodb://localhost:27017/mysite  here mongodb://url / database 
-//here mysite is database
+//here mysite is database 
 mongoose.connect('mongodb://localhost:27017/mysite' , {
     useNewUrlParser:true,
     useUnifiedTopology: true

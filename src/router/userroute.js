@@ -53,10 +53,14 @@ router.patch("/user/:id", async (req, res) => {
     return res.status(404).send({ error: "Invalid updates" });
   }
   try {
-    const user = await usermodel.findByIdAndUpdate(req.params.id, req.body, {
+    const user = await usermodel.findById(req.params.id)
+    updates.forEach(arg => user[arg] = req.body[updates])
+    await user.save()
+    console.log(user)
+  /*   const user = await usermodel.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
-    });
+    }); */
     //new means new update with another copy in const user and run validator means run that validator agian when update
     if (!user) return res.status(401).send();
     res.status(201).send(user);
