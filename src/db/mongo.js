@@ -5,7 +5,8 @@ const mongoose = require('mongoose')
 //here mysite is database 
 mongoose.connect('mongodb://localhost:27017/mysite' , {
     useNewUrlParser:true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useCreateIndex: true,
 })
 
 

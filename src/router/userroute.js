@@ -27,6 +27,19 @@ router.get("/user", async (req, res) => {
 
 
 
+//login
+router.post('/user/login' , async (req, res)=>{
+  try {
+    const userlog = await usermodel.findbyCredentials(req.body.email , req.body.password)
+    res.send(userlog)
+   
+  } catch (error) {
+    res.status(404).send(error)
+  }
+
+})
+
+
 //REad user by id 
 router.get("/user/:id", async (req, res) => {
   const _id = req.params.id;

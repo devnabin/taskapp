@@ -22,6 +22,7 @@ const bcrypt = require('bcrypt')
     email :{
         type : String,
         lowercase : true,
+        unique: true,
         trim : true , 
         required : true,
         validate(value){
@@ -44,9 +45,18 @@ const bcrypt = require('bcrypt')
 
     }
 })
+//
+userSchema.statics.findbyCredentials = async(email ,password)=>{
+    const user = await usermodel.findOne({email})
+    if(!user)  throw new error('Unable to login');
+    const isMatch = await bcrypt.compare(password , user.password)
+    if(!isMatch) throw new error('unable to login')
+    return user;
+}
 
 
-//pre
+
+//pre --> hash the plain text password before saving
 userSchema.pre('save' ,async function(next){
     const user = this
     if(user.isModified('password')){
