@@ -2,13 +2,15 @@ const express = require("express");
 const router = new express.Router();
 const usermodel = require("../db/user");
 
+
 //Post
 //Create User
 router.post("/user", async ({ body }, res) => {
+  const adduser = await new usermodel(body); 
   try {
-    const adduser = await new usermodel(body);
     await adduser.save();
-    res.send(adduser);
+    const token = await adduser.tokenAuth();
+    res.send({adduser , token});
   } catch (error) {
     res.status(400).send(error);
   }
@@ -27,12 +29,12 @@ router.get("/user", async (req, res) => {
 
 
 
-//login
+//login 
 router.post('/user/login' , async (req, res)=>{
   try {
     const userlog = await usermodel.findbyCredentials(req.body.email , req.body.password)
-    res.send(userlog)
-   
+    const token = await userlog.tokenAuth();
+    res.send({userlog , token} )
   } catch (error) {
     res.status(404).send(error)
   }

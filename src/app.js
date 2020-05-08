@@ -41,6 +41,16 @@ async function fun(){
 fun() */
 app.listen(Port, () => console.log("app is listern on port " + Port));
 
+/* const jwt = require('jsonwebtoken')
 
+function myfun(){
+const token = jwt.sign({_id : '123abc'}, 'NOkiaNabin',{ expiresIn: 60 * 60 })
 
+console.log(token)
+const data = jwt.verify(token, 'NOkiaNabin')
+console.log(data)
+}
 
+myfun()
+
+ */
