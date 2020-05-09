@@ -9,6 +9,16 @@ const taskRouter = require('./router/taskroute')
 
 
 const app = express();
+/*
+//Middle ware for getting method
+app.use((req, res, next)=>{
+  if(req.method === 'GET'){
+      res.send('Site will unabmle to get request')
+  }else{
+      next()
+  }
+}) 
+*/
 
 
 //to parse post json

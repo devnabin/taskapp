@@ -1,6 +1,7 @@
 const express = require("express");
 const router = new express.Router();
 const usermodel = require("../db/user");
+const auth = require('../middleware/auth')
 
 
 //Post
@@ -18,13 +19,14 @@ router.post("/user", async ({ body }, res) => {
 
 
 //Read all the User
-router.get("/user", async (req, res) => {
-  try {
+router.get("/user/me", auth ,  async (req, res) => {
+  res.send(req.user)
+ /*  try {
     const user = await usermodel.find({});
     res.send(user);
   } catch (error) {
     res.status(500).send();
-  }
+  } */
 });
 
 
