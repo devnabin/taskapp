@@ -62,5 +62,4 @@ console.log(data)
 }
 
 myfun()
-
  */
