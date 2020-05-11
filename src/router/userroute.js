@@ -35,8 +35,8 @@ router.post("/user/login", async (req, res) => {
       req.body.password
     );
     const token = await userlog.tokenAuth();
-    const user = await userlog.hidedata();
-    res.send({ user, token });
+    // const user = userlog.hidedata();  //Old way to hide data
+    res.status(200).send({ userlog , token });
   } catch (error) {
     res.status(404).send(error);
   }

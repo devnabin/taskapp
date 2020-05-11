@@ -52,12 +52,23 @@ const userSchema = new mongoose.Schema({
   ], 
 });
 
-//auto run fun
-userSchema.methods.hidedata = async function(){
+//auto run fun for hiding data 
+/*
+// Old method
+userSchema.methods.hidedata = function(){
   const user = this
   //getting raw data
   const userObject = user.toObject();
   //deleting other fields
+  delete userObject.tokens
+  delete userObject.password
+  return userObject;
+}
+*/
+//New Method to hideing private data
+userSchema.methods.toJSON = function(){  //.tojson method will be call automatically call 
+  const user = this
+  const userObject = user.toObject();  //to object is a way to copy raw data
   delete userObject.tokens
   delete userObject.password
   return userObject;
