@@ -52,6 +52,17 @@ const userSchema = new mongoose.Schema({
   ], 
 });
 
+//auto run fun
+userSchema.methods.hidedata = async function(){
+  const user = this
+  //getting raw data
+  const userObject = user.toObject();
+  //deleting other fields
+  delete userObject.tokens
+  delete userObject.password
+  return userObject;
+}
+
 
 //gettoken
 userSchema.methods.tokenAuth = async function () {

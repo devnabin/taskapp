@@ -35,7 +35,8 @@ router.post("/user/login", async (req, res) => {
       req.body.password
     );
     const token = await userlog.tokenAuth();
-    res.send({ userlog, token });
+    const user = await userlog.hidedata();
+    res.send({ user, token });
   } catch (error) {
     res.status(404).send(error);
   }
@@ -48,9 +49,9 @@ router.post("/user/logout", auth, async (req, res) => {
       (args) => args.token !== req.token
     );
     await req.user.save();
-    res.status(200).send(req.user)
+    res.status(200).send(req.user);
   } catch (error) {
-    res.status(404).send('Unable to log out')
+    res.status(404).send("Unable to log out");
   }
 });
 
@@ -101,7 +102,7 @@ router.patch("/user/me", auth, async (req, res) => {
 });
 
 //Delete User by id
-router.delete("/user/me", auth , async (req, res) => {
+router.delete("/user/me", auth, async (req, res) => {
   try {
     //const user = await usermodel.findByIdAndDelete(req.params.id);
     await req.user.remove();
