@@ -63,7 +63,7 @@ router.post("/user/logouts", auth, async (req, res) => {
   } catch (error) {}
 });
 
-//REad user by id
+/* //REad user by id
 router.get("/user/:id", async (req, res) => {
   const _id = req.params.id;
   try {
@@ -73,10 +73,10 @@ router.get("/user/:id", async (req, res) => {
   } catch (error) {
     res.status(500).send();
   }
-});
+}); */
 
 //patch update User by id
-router.patch("/user/:id", async (req, res) => {
+router.patch("/user/me", auth, async (req, res) => {
   const updates = Object.keys(req.body);
   console.log(updates);
   const allowUpdate = ["name", "email", "password"];
@@ -86,28 +86,25 @@ router.patch("/user/:id", async (req, res) => {
     return res.status(404).send({ error: "Invalid updates" });
   }
   try {
-    const user = await usermodel.findById(req.params.id);
-    updates.forEach((arg) => (user[arg] = req.body[updates]));
-    await user.save();
-    console.log(user);
+    // const user = await usermodel.findById(req.params.id);
+    updates.forEach((arg) => (req.user[arg] = req.body[updates]));
+    await req.user.save();
     /*   const user = await usermodel.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     }); */
     //new means new update with another copy in const user and run validator means run that validator agian when update
-    if (!user) return res.status(401).send();
-    res.status(201).send(user);
+    res.status(201).send(req.user);
   } catch (error) {
     res.status(401).send(error);
   }
 });
 
 //Delete User by id
-router.delete("/user/:id", async (req, res) => {
+router.delete("/user/me", auth , async (req, res) => {
   try {
-    const user = await usermodel.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).send();
-
+    //const user = await usermodel.findByIdAndDelete(req.params.id);
+    await req.user.remove();
     res.status(200).send(user);
   } catch (error) {
     res.status(500).send();
