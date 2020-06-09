@@ -1,20 +1,22 @@
 const express = require("express");
 const router = new express.Router();
 const taskmodel = require("../db/task");
-
+const auth = require("../middleware/auth");
 
 //Create Task
-router.post("/task", async ({ body }, res) => {
+router.post("/task", auth, async (req, res) => {
   try {
-    const mytask = await new taskmodel(body);
+    // const mytask = await new taskmodel(body);
+    const mytask = new taskmodel({
+      ...req.body,
+      Owner: req.user._id,
+    });
     await mytask.save();
     res.status(300).send(mytask);
   } catch (error) {
     res.status(400).send(error);
   }
 });
-
-
 
 //Task Page for end point
 //Searching all the task
@@ -26,7 +28,6 @@ router.get("/task", async (req, res) => {
     res.status(500).send();
   }
 });
-
 
 //Search task by id
 router.get("/task/:id", async (req, res) => {
@@ -40,8 +41,6 @@ router.get("/task/:id", async (req, res) => {
   }
 });
 
-
-
 //Update the task  by id
 router.patch("/task/:id", async (req, res) => {
   const updates = Object.keys(req.body);
@@ -51,13 +50,13 @@ router.patch("/task/:id", async (req, res) => {
     return res.status(401).send({ error: "Invalid request" });
   }
   try {
-  /*   const task = await taskmodel.findByIdAndUpdate(req.params.id, req.body, {
+    /*   const task = await taskmodel.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     }); */
-    const task = await taskmodel.findById(req.params.id)
-    updates.forEach(arg => task[arg] =req.body[arg])
-    await task.save()
+    const task = await taskmodel.findById(req.params.id);
+    updates.forEach((arg) => (task[arg] = req.body[arg]));
+    await task.save();
     if (!task) return res.status(401).send();
     res.status(200).send(task);
   } catch (error) {
@@ -65,8 +64,7 @@ router.patch("/task/:id", async (req, res) => {
   }
 });
 
-
-//Delete task by id 
+//Delete task by id
 router.delete("/task/:id", async (req, res) => {
   try {
     const task = await taskmodel.findByIdAndDelete(req.params.id);
@@ -77,7 +75,5 @@ router.delete("/task/:id", async (req, res) => {
   }
 });
 
-
-
-//exporting task 
+//exporting task
 module.exports = router;

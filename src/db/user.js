@@ -52,6 +52,14 @@ const userSchema = new mongoose.Schema({
   ], 
 });
 
+//relation ship to the task
+userSchema.virtual('tasks', {
+  ref: 'task',  //collection named task in the database
+  localField : '_id',
+  foreignField : 'Owner'
+})
+
+
 //auto run fun for hiding data 
 /*
 // Old method
