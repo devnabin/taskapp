@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const task = require("./task"); //for deleting user task when user delete itself
 
 //model for user
 //Here user is the Collection
@@ -42,25 +43,24 @@ const userSchema = new mongoose.Schema({
       }
     },
   },
-   tokens: [
+  tokens: [
     {
       token: {
         type: String,
-        required: true
+        required: true,
       },
     },
-  ], 
+  ],
 });
 
 //relation ship to the task
-userSchema.virtual('tasks', {
-  ref: 'task',  //collection named task in the database
-  localField : '_id',
-  foreignField : 'Owner'
-})
+userSchema.virtual("tasks", {
+  ref: "task", //collection named task in the database
+  localField: "_id",
+  foreignField: "Owner",
+});
 
-
-//auto run fun for hiding data 
+//auto run fun for hiding data
 /*
 // Old method
 userSchema.methods.hidedata = function(){
@@ -73,22 +73,23 @@ userSchema.methods.hidedata = function(){
   return userObject;
 }
 */
+//or ======>
 //New Method to hideing private data
-userSchema.methods.toJSON = function(){  //.tojson method will be call automatically call 
-  const user = this
-  const userObject = user.toObject();  //to object is a way to copy raw data
-  delete userObject.tokens
-  delete userObject.password
+userSchema.methods.toJSON = function () {
+  //.tojson method will be call automatically call
+  const user = this;
+  const userObject = user.toObject(); //to object is a way to copy raw data
+  delete userObject.tokens;
+  delete userObject.password;
   return userObject;
-}
-
+};
 
 //gettoken
 userSchema.methods.tokenAuth = async function () {
   const user = this;
   const token = jwt.sign({ _id: user._id.toString() }, "NOkiaNabin");
-  user.tokens =user.tokens.concat({token})
-  await user.save()
+  user.tokens = user.tokens.concat({ token });
+  await user.save();
   return token;
 };
 
@@ -110,8 +111,12 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+//delete user task when user is deleted
+userSchema.pre("remove", async function (next) {
+  await task.deleteMany({ Owner: this._id });
+  next();
+});
 
 const usermodel = mongoose.model("user", userSchema);
-
 
 module.exports = usermodel;
